@@ -1,0 +1,183 @@
+// Driver code
+
+import java.util.Vector;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Thread t;
+
+        // Threads are created to represent the actors in the model.
+        // They are set as deamon threads so that they will exit together with the main thread.
+        t = new Thread(new CakeBaker(), "B1");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeBaker(), "B2");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeBaker(), "B3");
+        t.setDaemon(true); t.start();
+        t = new Thread(new Supplier(), "S1");
+        t.setDaemon(true); t.start();
+        t = new Thread(new Supplier(), "S2");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeMonster(), "M1");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeMonster(), "M2");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeMonster(), "M3");
+        t.setDaemon(true); t.start();
+
+        // The main thread will sleep for a while before exiting.
+        try {
+            Thread.sleep(10000);
+        }
+        catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private static class CakeBaker implements Runnable {
+        public void run() {
+            try {
+                int n = 7;      // number of cakes each CakeBaker bakes.
+                while (n-- > 0) {
+                    CakeStand.putCake((int)(3+Math.random()*5));
+                    Thread.sleep((int)(Math.random()*200));
+                }
+            }
+            catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static class CakeMonster implements Runnable {
+        public void run() {
+            try {
+                int n = 10;     // number of slices each CakeMonster wants to eat.
+                while (n-- > 0) {
+                    CakeStand.randomStand().getSlice();
+                    Thread.sleep((int)(Math.random()*100));
+                }
+            }
+            catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private static class Supplier implements Runnable {
+        public void run() {
+            try {
+                int n = 3;     // number of stands each Supplier brings.
+                while (n-- > 0) {
+                    CakeStand.supplyStand();
+                    Thread.sleep((int)(Math.random()*1000));
+                }
+            }
+            catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+}
+
+
+/********************************************************************************
+        Output:
+
+        S2 brought a new stand.
+        S1 brought a new stand.
+        M2 came to Stand#1 for a slice.
+        M3 came to Stand#1 for a slice.
+        B3 baked a cake with 6 slices.
+        S2 added Stand#1.
+        B2 baked a cake with 7 slices.
+        M1 came to Stand#1 for a slice.
+        S1 added Stand#2.
+        B1 baked a cake with 7 slices.
+        B3 put the cake with 6 slices on Stand#1.
+        B3 put the cake with 6 slices on Stand#2.
+        M2 got a slice from Stand#1, so 5 slices left.
+        M2 came to Stand#2 for a slice.
+        M2 got a slice from Stand#2, so 5 slices left.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 4 slices left.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 3 slices left.
+        B3 baked a cake with 7 slices.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 2 slices left.
+        M2 came to Stand#2 for a slice.
+        M2 got a slice from Stand#2, so 4 slices left.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 1 slices left.
+        M2 came to Stand#2 for a slice.
+        M2 got a slice from Stand#2, so 3 slices left.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 0 slices left.
+        B2 put the cake with 7 slices on Stand#1.
+        M3 got a slice from Stand#1, so 6 slices left.
+        M2 came to Stand#1 for a slice.
+        M2 got a slice from Stand#1, so 5 slices left.
+        M3 came to Stand#1 for a slice.
+        M3 got a slice from Stand#1, so 4 slices left.
+        M3 came to Stand#1 for a slice.
+        M3 got a slice from Stand#1, so 3 slices left.
+        B2 baked a cake with 5 slices.
+        M3 came to Stand#1 for a slice.
+        M3 got a slice from Stand#1, so 2 slices left.
+        M3 came to Stand#2 for a slice.
+        M3 got a slice from Stand#2, so 2 slices left.
+        M3 came to Stand#2 for a slice.
+        M3 got a slice from Stand#2, so 1 slices left.
+        M3 came to Stand#1 for a slice.
+        M3 got a slice from Stand#1, so 1 slices left.
+        M3 came to Stand#1 for a slice.
+        M3 got a slice from Stand#1, so 0 slices left.
+        B1 put the cake with 7 slices on Stand#1.
+        M1 got a slice from Stand#1, so 6 slices left.
+        M3 came to Stand#2 for a slice.
+        M3 got a slice from Stand#2, so 0 slices left.
+        B3 put the cake with 7 slices on Stand#2.
+        B3 baked a cake with 5 slices.
+        M1 came to Stand#1 for a slice.
+        M1 got a slice from Stand#1, so 5 slices left.
+        M3 came to Stand#2 for a slice.
+        M3 got a slice from Stand#2, so 6 slices left.
+        M1 came to Stand#2 for a slice.
+        M1 got a slice from Stand#2, so 5 slices left.
+        S1 brought a new stand.
+        S1 added Stand#3.
+        B2 put the cake with 5 slices on Stand#3.
+        M1 came to Stand#2 for a slice.
+        M1 got a slice from Stand#2, so 4 slices left.
+        B1 baked a cake with 7 slices.
+        S2 brought a new stand.
+        S2 added Stand#4.
+        B3 put the cake with 5 slices on Stand#4.
+        M1 came to Stand#4 for a slice.
+        M1 got a slice from Stand#4, so 4 slices left.
+        M1 came to Stand#4 for a slice.
+        M1 got a slice from Stand#4, so 3 slices left.
+        M1 came to Stand#2 for a slice.
+        M1 got a slice from Stand#2, so 3 slices left.
+        B2 baked a cake with 7 slices.
+        M1 came to Stand#3 for a slice.
+        M1 got a slice from Stand#3, so 4 slices left.
+        B3 baked a cake with 6 slices.
+        M1 came to Stand#3 for a slice.
+        M1 got a slice from Stand#3, so 3 slices left.
+        M1 came to Stand#1 for a slice.
+        M1 got a slice from Stand#1, so 4 slices left.
+        S1 brought a new stand.
+        S1 added Stand#5.
+        B1 put the cake with 7 slices on Stand#5.
+        B1 baked a cake with 7 slices.
+        S2 brought a new stand.
+        S2 added Stand#6.
+        B2 put the cake with 7 slices on Stand#6.
+        B2 baked a cake with 4 slices.
+*/

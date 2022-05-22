@@ -115,11 +115,11 @@ public class CakeStand{
                         // we should notify monsters of all the new slices so if there are monsters they start eating
                         // has to be done while locking slice number. dangerous modification.
                         stand.notify_slicesSemaphore(slices);
+                        return;
                     }
                 } finally {
                     stand.unlock_stand();
                 }
-                break;
             }
         }
         finally {

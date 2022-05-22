@@ -5,10 +5,12 @@ import java.util.concurrent.locks.*;
 
 public class CakeStand{
     private int cake;
+    private int id;
     private boolean availability;
-    public CakeStand(int slices){
+    public CakeStand(int slices, int no){
         cake=slices;
         availability=true;
+        id = no;
     }
     // one monster bites at a time. cake-level lock. visitor monsters wait for this.
     private final Semaphore sliceSemaphore = new Semaphore(0);
@@ -21,8 +23,9 @@ public class CakeStand{
     public void available(){availability=true;}
     public boolean askIFAvailable(){return availability;}
     public int askSlices(){return cake;}
-    public void eaten(){cake--;}
+    public void eaten(){cake--; if(this.askSlices() == 0) available();}
     public void insertcake(int slices){cake=slices; inavailable();}
+    public int getID(){return id;}
     public void lock_stand(){
        protectStand.lock();
     }
@@ -67,13 +70,22 @@ public class CakeStand{
         // one supplier thread can run below at once
         Ground.lockSuppliersGround();
         try {
-            CakeStand newStand = new CakeStand(0);
-            // its ok to both push to stand and print count as suppliers are only 1 and
-            // safe to have its cake's slices value set by another baker thread, after line 36
+            CakeStand newStand = new CakeStand(0, Ground.getStandsCount() + 1);
+            // its ok to concurrently push new stand to stands and have a cake put by baker,
+            // and select any stands by monsters who uses fail-safe.
             Ground.addStand(newStand);
-            System.out.println(callerName + " added Stand#" + Ground.getStandsCount() + ".");
+            System.out.println(callerName + " added Stand#" + newStand.getID() + ".");
             Ground.notify_bakerssuppliedStand();
-            //Ground.signalAll_monsters_suppliedStand();
+            // for early bird monsters only. safe as mentioned, but i have to lock due to CV strictly bound to a lock object
+            if(Ground.getStandsCount() > 1){
+                Ground.lockstartWorld();
+                try {
+                    Ground.signalAll_monsters_suppliedStand();
+                }
+                finally {
+                    Ground.unlockstartWorld();
+                }
+            }
         }
         finally {
             Ground.unlockSuppliersGround();
@@ -90,24 +102,24 @@ public class CakeStand{
         try {
             // stand guaranteed to be set. as semaphore just notified of its existence.
             CakeStand stand = null;
-            int id = 1;
             // Fail-safe iterator. only modifies elements instead of writing, so memory consumption controlled.
-            for (Iterator it = Ground.getStands().iterator(); it.hasNext(); id++) {
+            for (Iterator it = Ground.getStands().iterator(); it.hasNext(); ) {
                 stand = (CakeStand) it.next();
+                // askIFAvailable has to be locked due to potential active eating monsters
                 stand.lock_stand();
                 try {
                     if (stand.askIFAvailable()) {
-                        System.out.println(callerName + " put the cake with " + slices + " slices on Stand#" + id + ".");
+                        System.out.println(callerName + " put the cake with " + slices + " slices on Stand#" + stand.getID() + ".");
                         // insert cake into stand. this also makes the stand inavailable.
                         stand.insertcake(slices);
+                        // we should notify monsters of all the new slices so if there are monsters they start eating
+                        // has to be done while locking slice number. dangerous modification.
+                        stand.notify_slicesSemaphore(slices);
                     }
                 } finally {
                     stand.unlock_stand();
                 }
-            }
-            if (stand != null) {
-                // we should notify monsters of all the new slices
-                stand.notify_slicesSemaphore(slices);
+                break;
             }
         }
         finally {
@@ -116,29 +128,38 @@ public class CakeStand{
     }
     public static CakeStand randomStand() {
         String callerName = Thread.currentThread().getName();
-        int id = 1;
         CakeStand stand = null;
         // only the early arrivals need to be signalled. others can find a stand anyway.
         // so, if no stands exist, wait for a signal not to employ busy wait.
         // first put stand notifies all, so all waiters can eventually find one.
-        Ground.lockprotectStands();
+        Ground.lockstartWorld();
         try {
-            if (Ground.getStands().size() == 0) Ground.wait_monsters_suppliedStand();
-            for (Iterator it = Ground.getStands().iterator(); it.hasNext(); id++) {
-                stand = (CakeStand) it.next();
-                System.out.println(callerName + " came to Stand#" + id + " for a slice.");
-                break;
-            }
-            if (stand == null) System.out.println(callerName + " smth went seriously wrong in randomStand#");
+            while (Ground.getStands().size() == 0) Ground.wait_monsters_suppliedStand();
         }
         finally {
-            Ground.unlockprotectStands();
+            Ground.unlockstartWorld();
         }
+        // unlock immediately to allow concurrent run of different monsters
+        int chosenID = (int) ((Math.random() * (Ground.getStands().size() - 1)) + 1);
+        System.out.println(callerName + " came to Stand#" + chosenID + " for a slice.");
+        stand = Ground.getSpecificStand(chosenID-1);
         return stand;
     }
     public void getSlice() {
-
-
+        String callerName = Thread.currentThread().getName();
+        // wait until an available cake.
+        // diff monsters cannot eat at the same time due to lock_stand, even if the only signalled monster was this
+        // the cake is protected as well for one slice at a time
+        wait_sliceSemaphore();
+        // to eat it, protect the stand and related cake info
+        lock_stand();
+        try {
+            eaten(); // makes it also available if no cake left anymore
+            System.out.println(callerName + " got a slice from Stand#" + this.getID() +", so " + this.askSlices() + " left.");
+        }
+        finally {
+            unlock_stand();
+        }
     }
 
 }

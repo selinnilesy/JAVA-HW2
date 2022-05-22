@@ -23,8 +23,8 @@ public class Ground {
     // to wait for any supplied stands, used by cake bakers.
     static private final Semaphore bakers_suppliedStand = new Semaphore(0);
     // to wait for random stands, used by monsters.
-    static private Lock protectStands = new ReentrantLock();
-    static private Condition monsters_suppliedStand = protectStands.newCondition();
+    static private Lock startWorld = new ReentrantLock();
+    static private Condition monsters_suppliedStand = startWorld.newCondition();
 
     /* -------------------------------  methods below -------------------------------------
     *
@@ -42,11 +42,11 @@ public class Ground {
         return stands.get(index);
     }
     // no checked exception in lock/unlock, but semaphores and CVs need to be tried.
-    static protected void lockprotectStands(){
-        protectStands.lock();
+    static protected void lockstartWorld(){
+        startWorld.lock();
     }
-    static protected void unlockprotectStands(){
-        protectStands.unlock();
+    static protected void unlockstartWorld(){
+        startWorld.unlock();
     }
     static protected void wait_monsters_suppliedStand() {
         try {

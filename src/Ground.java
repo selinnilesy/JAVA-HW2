@@ -1,6 +1,7 @@
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -13,7 +14,7 @@ public class Ground {
     // ground-level lock.
     static private Lock ground_bakers = new ReentrantLock();
     // id of any stand = its index since they are not destroyed but kept after cake finishes
-    static private ArrayList<Stand> stands= new ArrayList<Stand>();
+    static private CopyOnWriteArrayList<Stand> stands= new CopyOnWriteArrayList<Stand>();
     // to wait for any supplied stands, used by cake bakers.
     static private final Semaphore suppliedStand = new Semaphore(0);
     public static class Stand{
@@ -22,7 +23,7 @@ public class Ground {
         // one monster bites at a time. cake-level lock. new monsters wait this.
         private final Semaphore sliceSemaphore = new Semaphore(0);
         // to mutate variables before and after semaphore activity
-        private final Lock protectCakeInfo = new ReentrantLock();
+        private final Lock protectStand = new ReentrantLock();
         public Stand(int slices){
             cake=slices;
             availability=true;
@@ -33,17 +34,17 @@ public class Ground {
         public int askSlices(){return cake;}
         public void eaten(){cake--;}
         public void putCake(int slices){cake=slices; inavailable();}
-        public void lock_cake(){
+        public void lock_stand(){
             try{
-                protectCakeInfo.lock();
+                protectStand.lock();
             }
             catch(Exception e){
                 System.out.println("lock_cake throws: " + e);
             }
         }
-        public void unlock_cake(){
+        public void unlock_stand(){
             try{
-                protectCakeInfo.unlock();
+                protectStand.unlock();
             }
             catch(Exception e){
                 System.out.println("unlock_cake throws: " + e);
@@ -57,17 +58,18 @@ public class Ground {
                 System.out.println("wait_sliceSemaphore throws: " + e);
             }
         }
-        public void notify_sliceSemaphore(){
-            try{
-                sliceSemaphore.release();
-            }
-            catch(Exception e){
-                System.out.println("notify_sliceSemaphore throws: " + e);
+        public void notify_slicesSemaphore(int slices) {
+            for (int newSlices = slices; newSlices > 0; newSlices--) {
+                try {
+                    sliceSemaphore.release();
+                } catch (Exception e) {
+                    System.out.println("notify_sliceSemaphore throws: " + e);
+                }
             }
         }
     }
 
-    static protected ArrayList<Stand> getStands(){
+    static protected CopyOnWriteArrayList<Stand> getStands(){
         return stands;
     }
     static protected void addStand(Stand stand){

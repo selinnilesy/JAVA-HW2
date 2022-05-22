@@ -48,25 +48,21 @@ public class CakeStand extends Ground{
         Ground.lockBakersGround();
         // did not prefer using Fail-safe iterator. to find the first available stand, as semaphore notified of its existence.
         // this code is safe but used synchronized only to bypass concurrent modif exception
-        int index = 0;
+        int id = 1;
         Stand stand = null;
-        synchronized (Ground.getStands()) {
-            for (Iterator it = Ground.getStands().iterator(); it.hasNext(); index++) {
-                stand = (Stand) it.next();
-                stand.lock_cake();
-                if(stand.askIFAvailable()){
-                    System.out.println(callerName + " put the cake with " + slices + "slices on Stand#" + index + ".");
-                    // insert cake into stand. this also makes inavailable.
-                    stand.putCake(slices);
-                }
-                stand.unlock_cake();
+        for (Iterator it = Ground.getStands().iterator(); it.hasNext(); id++) {
+            stand = (Stand) it.next();
+            stand.lock_stand();
+            if(stand.askIFAvailable()){
+                System.out.println(callerName + " put the cake with " + slices + " slices on Stand#" + id + ".");
+                // insert cake into stand. this also makes the stand inavailable.
+                stand.putCake(slices);
             }
+            stand.unlock_stand();
         }
-        // we can notify monsters of slices after unlocking the stand&cake
-        // and whole stands which were locked due to iteration
+        // we should notify monsters of all the new slices
         if(stand != null){
-            for (int newSlices = slices; newSlices>0; newSlices--)
-                stand.notify_sliceSemaphore();
+            stand.notify_slicesSemaphore(slices);
         }
         Ground.unlockBakersGround();
     }

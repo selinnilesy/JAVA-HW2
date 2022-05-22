@@ -3,10 +3,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Ground {
+    /* -------------------------------  static ground members -------------------------------------
+     *
+     */
     // to protect stands from concurrent ArrayList addition
     // ground-level lock.
     static private Lock ground_suppliers = new ReentrantLock();
@@ -14,119 +18,78 @@ public class Ground {
     // ground-level lock.
     static private Lock ground_bakers = new ReentrantLock();
     // id of any stand = its index since they are not destroyed but kept after cake finishes
-    static private CopyOnWriteArrayList<Stand> stands= new CopyOnWriteArrayList<Stand>();
+    // there is no lock on this due to fail safe iterator, and not to block potential concurrency
+    static private CopyOnWriteArrayList<CakeStand> stands= new CopyOnWriteArrayList<CakeStand>();
     // to wait for any supplied stands, used by cake bakers.
-    static private final Semaphore suppliedStand = new Semaphore(0);
-    public static class Stand{
-        private int cake;
-        private boolean availability;
-        // one monster bites at a time. cake-level lock. new monsters wait this.
-        private final Semaphore sliceSemaphore = new Semaphore(0);
-        // to mutate variables before and after semaphore activity
-        private final Lock protectStand = new ReentrantLock();
-        public Stand(int slices){
-            cake=slices;
-            availability=true;
-        }
-        public void inavailable(){availability=false;}
-        public void available(){availability=true;}
-        public boolean askIFAvailable(){return availability;}
-        public int askSlices(){return cake;}
-        public void eaten(){cake--;}
-        public void putCake(int slices){cake=slices; inavailable();}
-        public void lock_stand(){
-            try{
-                protectStand.lock();
-            }
-            catch(Exception e){
-                System.out.println("lock_cake throws: " + e);
-            }
-        }
-        public void unlock_stand(){
-            try{
-                protectStand.unlock();
-            }
-            catch(Exception e){
-                System.out.println("unlock_cake throws: " + e);
-            }
-        }
-        public void wait_sliceSemaphore(){
-            try{
-                sliceSemaphore.acquire();
-            }
-            catch(Exception e){
-                System.out.println("wait_sliceSemaphore throws: " + e);
-            }
-        }
-        public void notify_slicesSemaphore(int slices) {
-            for (int newSlices = slices; newSlices > 0; newSlices--) {
-                try {
-                    sliceSemaphore.release();
-                } catch (Exception e) {
-                    System.out.println("notify_sliceSemaphore throws: " + e);
-                }
-            }
-        }
-    }
+    static private final Semaphore bakers_suppliedStand = new Semaphore(0);
+    // to wait for random stands, used by monsters.
+    static private Lock protectStands = new ReentrantLock();
+    static private Condition monsters_suppliedStand = protectStands.newCondition();
 
-    static protected CopyOnWriteArrayList<Stand> getStands(){
+    /* -------------------------------  methods below -------------------------------------
+    *
+    */
+    static protected CopyOnWriteArrayList<CakeStand> getStands(){
         return stands;
     }
-    static protected void addStand(Stand stand){
+    static protected void addStand(CakeStand stand){
         stands.add(stand);
     }
     static protected int getStandsCount(){
         return stands.size();
     }
-    static protected Stand getSpecificStand(int index){
+    static protected CakeStand getSpecificStand(int index){
         return stands.get(index);
     }
-    static protected void wait_suppliedStand(){
-        try{
-            suppliedStand.acquire();
-        }
-        catch(Exception e){
-            System.out.println("wait_suppliedStand throws: " + e);
+    // no checked exception in lock/unlock, but semaphores and CVs need to be tried.
+    static protected void lockprotectStands(){
+        protectStands.lock();
+    }
+    static protected void unlockprotectStands(){
+        protectStands.unlock();
+    }
+    static protected void wait_monsters_suppliedStand() {
+        try {
+            monsters_suppliedStand.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            System.out.println("wait_monsters_suppliedStand throws: " + e);
         }
     }
-    static protected void notify_suppliedStand(){
+    static protected void signalAll_monsters_suppliedStand(){
         try{
-            suppliedStand.release();
+            monsters_suppliedStand.signalAll();
         }
         catch(Exception e){
-            System.out.println("notify_suppliedStand throws: " + e);
+            System.out.println("signalAll_monsters_suppliedStand throws: " + e);
+        }
+    }
+    static protected void wait_bakerssuppliedStand(){
+        try{
+            bakers_suppliedStand.acquire();
+        }
+        catch(Exception e){
+            System.out.println("wait_bakerssuppliedStand throws: " + e);
+        }
+    }
+    static protected void notify_bakerssuppliedStand(){
+        try{
+            bakers_suppliedStand.release();
+        }
+        catch(Exception e){
+            System.out.println("notify_bakerssuppliedStand throws: " + e);
         }
     }
     static protected void lockBakersGround(){
-        try{
-            ground_bakers.lock();
-        }
-        catch(Exception e){
-            System.out.println("lockBakersGround throws: " + e);
-        }
-    }
-    static protected void lockSuppliersGround(){
-        try{
-            ground_suppliers.lock();
-        }
-        catch(Exception e){
-            System.out.println("lockSuppliersGround throws: " + e);
-        }
+        ground_bakers.lock();
     }
     static protected void unlockBakersGround(){
-        try{
-            ground_bakers.unlock();
-        }
-        catch(Exception e){
-            System.out.println("unlockBakersGround throws: " + e);
-        }
+        ground_bakers.unlock();
+    }
+    static protected void lockSuppliersGround(){
+        ground_suppliers.lock();
     }
     static protected void unlockSuppliersGround(){
-        try{
-            ground_suppliers.unlock();
-        }
-        catch(Exception e){
-            System.out.println("unlockSuppliersGround throws: " + e);
-        }
+        ground_suppliers.unlock();
     }
 }

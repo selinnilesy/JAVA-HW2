@@ -21,12 +21,14 @@ public class Main {
         t.setDaemon(true); t.start();
         t = new Thread(new Supplier(), "S2");
         t.setDaemon(true); t.start();
-        //t = new Thread(new CakeMonster(), "M1");
-        //t.setDaemon(true); t.start();
-        //t = new Thread(new CakeMonster(), "M2");
-        //t.setDaemon(true); t.start();
-        //t = new Thread(new CakeMonster(), "M3");
-        //t.setDaemon(true); t.start();
+        /*
+        t = new Thread(new CakeMonster(), "M1");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeMonster(), "M2");
+        t.setDaemon(true); t.start();
+        t = new Thread(new CakeMonster(), "M3");
+        t.setDaemon(true); t.start();
+         */
 
         // The main thread will sleep for a while before exiting.
         try {
@@ -67,7 +69,7 @@ public class Main {
             }
         }
     }
-    */
+     */
 
     private static class Supplier implements Runnable {
         public void run() {

@@ -71,20 +71,26 @@ public class CakeStand{
         Ground.lockSuppliersGround();
         try {
             CakeStand newStand = new CakeStand(0, Ground.getStandsCount() + 1);
-            // its ok to concurrently push new stand to stands and have a cake put by baker,
-            // and select any stands by monsters who uses fail-safe.
-            Ground.addStand(newStand);
-            System.out.println(callerName + " added Stand#" + newStand.getID() + ".");
-            Ground.notify_bakerssuppliedStand();
-            // for early bird monsters only. safe as mentioned, but i have to lock due to CV strictly bound to a lock object
-            if(Ground.getStandsCount() > 1){
-                Ground.lockstartWorld();
-                try {
-                    Ground.signalAll_monsters_suppliedStand();
+            // when the stand is unlocked, before we notify monsters of it being put on the ground,
+            // they come on to the stand at the entrance. fixed by forum post.
+            newStand.lock_stand();
+            try{
+                Ground.addStand(newStand);
+                System.out.println(callerName + " added Stand#" + newStand.getID() + ".");
+                Ground.notify_bakerssuppliedStand();
+                // for early bird monsters only.
+                if(Ground.getStandsCount() > 1){
+                    Ground.lockstartWorld();
+                    try {
+                        Ground.signalAll_monsters_suppliedStand();
+                    }
+                    finally {
+                        Ground.unlockstartWorld();
+                    }
                 }
-                finally {
-                    Ground.unlockstartWorld();
-                }
+            }
+            finally {
+                newStand.unlock_stand();
             }
         }
         finally {
@@ -141,8 +147,15 @@ public class CakeStand{
         }
         // unlock immediately to allow concurrent run of different monsters
         int chosenID = (int) ((Math.random() * (Ground.getStands().size() - 1)) + 1);
-        System.out.println(callerName + " came to Stand#" + chosenID + " for a slice.");
         stand = Ground.getSpecificStand(chosenID-1);
+        // wait until its put on the ground (in case it has not been put yet due to context switches)
+        stand.lock_stand();
+        try{
+            System.out.println(callerName + " came to Stand#" + chosenID + " for a slice.");
+        }
+        finally {
+            stand.unlock_stand();
+        }
         return stand;
     }
     public void getSlice() {

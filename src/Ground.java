@@ -22,7 +22,7 @@ public class Ground {
     static private CopyOnWriteArrayList<CakeStand> stands= new CopyOnWriteArrayList<CakeStand>();
     // to wait for any supplied stands, used by cake bakers.
     static private final Semaphore bakers_suppliedStand = new Semaphore(0);
-    // to wait for random stands, used by monsters.
+    // Condition variable is to wait before going to a random stand, used by early-bird monsters.
     static private Lock startWorld = new ReentrantLock();
     static private Condition monsters_suppliedStand = startWorld.newCondition();
 

@@ -90,94 +90,96 @@ Output:
 
 S2 brought a new stand.
 S1 brought a new stand.
-M2 came to Stand#1 for a slice.
-M1 came to Stand#1 for a slice.
-B3 baked a cake with 7 slices.
+B1 baked a cake with 6 slices.
+B3 baked a cake with 6 slices.
+B2 baked a cake with 5 slices.
 S2 added Stand#1.
 S1 added Stand#2.
-B2 baked a cake with 7 slices.
-B1 baked a cake with 7 slices.
+B1 put the cake with 6 slices on Stand#1.
+B3 put the cake with 6 slices on Stand#2.
+M1 came to Stand#1 for a slice.
+M2 came to Stand#1 for a slice.
+M1 got a slice from Stand#1, so 5 slices left.
+M2 got a slice from Stand#1, so 4 slices left.
+M1 came to Stand#1 for a slice.
 M3 came to Stand#1 for a slice.
-B3 put the cake with 7 slices on Stand#1.
-B2 put the cake with 7 slices on Stand#2.
-M3 got a slice from Stand#1, so 6 slices left.
-M2 got a slice from Stand#1, so 5 slices left.
-M3 came to Stand#2 for a slice.
-M3 got a slice from Stand#2, so 6 slices left.
-M2 came to Stand#2 for a slice.
-M2 got a slice from Stand#2, so 5 slices left.
-B2 baked a cake with 5 slices.
+M1 got a slice from Stand#1, so 3 slices left.
+M3 got a slice from Stand#1, so 2 slices left.
+B3 baked a cake with 5 slices.
+M2 came to Stand#1 for a slice.
+M2 got a slice from Stand#1, so 1 slices left.
+S1 brought a new stand.
+S1 added Stand#3.
+B2 put the cake with 5 slices on Stand#3.
+M1 came to Stand#2 for a slice.
+M1 got a slice from Stand#2, so 5 slices left.
+M1 came to Stand#3 for a slice.
+M1 got a slice from Stand#3, so 4 slices left.
 M3 came to Stand#2 for a slice.
 M3 got a slice from Stand#2, so 4 slices left.
-M3 came to Stand#2 for a slice.
-M3 got a slice from Stand#2, so 3 slices left.
+B2 baked a cake with 5 slices.
+B1 baked a cake with 3 slices.
+M2 came to Stand#1 for a slice.
+M2 got a slice from Stand#1, so 0 slices left.
+B3 put the cake with 5 slices on Stand#1.
 M3 came to Stand#1 for a slice.
 M3 got a slice from Stand#1, so 4 slices left.
-M2 came to Stand#1 for a slice.
-M2 got a slice from Stand#1, so 3 slices left.
+M1 came to Stand#1 for a slice.
+M1 got a slice from Stand#1, so 3 slices left.
 S2 brought a new stand.
-S2 added Stand#3.
-B1 put the cake with 7 slices on Stand#3.
+S2 added Stand#4.
+B2 put the cake with 5 slices on Stand#4.
+M1 came to Stand#4 for a slice.
+M1 got a slice from Stand#4, so 4 slices left.
+M1 came to Stand#3 for a slice.
+M1 got a slice from Stand#3, so 3 slices left.
+M2 came to Stand#4 for a slice.
+M2 got a slice from Stand#4, so 3 slices left.
+M2 came to Stand#2 for a slice.
+M2 got a slice from Stand#2, so 3 slices left.
+M3 came to Stand#3 for a slice.
+M3 got a slice from Stand#3, so 2 slices left.
+M1 came to Stand#2 for a slice.
+M1 got a slice from Stand#2, so 2 slices left.
+M1 came to Stand#4 for a slice.
+M1 got a slice from Stand#4, so 2 slices left.
+B3 baked a cake with 7 slices.
+M2 came to Stand#3 for a slice.
+M2 got a slice from Stand#3, so 1 slices left.
+M3 came to Stand#4 for a slice.
+M3 got a slice from Stand#4, so 1 slices left.
+M3 came to Stand#4 for a slice.
+M3 got a slice from Stand#4, so 0 slices left.
+B1 put the cake with 3 slices on Stand#4.
+M2 came to Stand#3 for a slice.
+M2 got a slice from Stand#3, so 0 slices left.
+B3 put the cake with 7 slices on Stand#3.
+M1 came to Stand#1 for a slice.
+M1 got a slice from Stand#1, so 2 slices left.
 M3 came to Stand#3 for a slice.
 M3 got a slice from Stand#3, so 6 slices left.
-M3 came to Stand#3 for a slice.
-M3 got a slice from Stand#3, so 5 slices left.
-B3 baked a cake with 5 slices.
-M3 came to Stand#2 for a slice.
-M3 got a slice from Stand#2, so 2 slices left.
-M2 came to Stand#3 for a slice.
-M2 got a slice from Stand#3, so 4 slices left.
-B1 baked a cake with 5 slices.
-M3 came to Stand#3 for a slice.
-M3 got a slice from Stand#3, so 3 slices left.
-M3 came to Stand#1 for a slice.
-M3 got a slice from Stand#1, so 2 slices left.
-M2 came to Stand#3 for a slice.
-M2 got a slice from Stand#3, so 2 slices left.
+B2 baked a cake with 7 slices.
 M2 came to Stand#1 for a slice.
 M2 got a slice from Stand#1, so 1 slices left.
 M2 came to Stand#1 for a slice.
 M2 got a slice from Stand#1, so 0 slices left.
-B2 put the cake with 5 slices on Stand#1.
-M1 got a slice from Stand#1, so 4 slices left.
-B2 baked a cake with 4 slices.
-M1 came to Stand#2 for a slice.
-M1 got a slice from Stand#2, so 1 slices left.
-M2 came to Stand#1 for a slice.
-M2 got a slice from Stand#1, so 3 slices left.
-M2 came to Stand#3 for a slice.
-M2 got a slice from Stand#3, so 1 slices left.
-M1 came to Stand#3 for a slice.
-M1 got a slice from Stand#3, so 0 slices left.
-B3 put the cake with 5 slices on Stand#3.
-S1 brought a new stand.
-S1 added Stand#4.
-B1 put the cake with 5 slices on Stand#4.
-M1 came to Stand#2 for a slice.
-M1 got a slice from Stand#2, so 0 slices left.
-B2 put the cake with 4 slices on Stand#2.
-B2 baked a cake with 4 slices.
-M2 came to Stand#1 for a slice.
-M2 got a slice from Stand#1, so 2 slices left.
-B3 baked a cake with 3 slices.
-S2 brought a new stand.
-S2 added Stand#5.
-B2 put the cake with 4 slices on Stand#5.
-B1 baked a cake with 4 slices.
-M1 came to Stand#1 for a slice.
-M1 got a slice from Stand#1, so 1 slices left.
-M1 came to Stand#4 for a slice.
-M1 got a slice from Stand#4, so 4 slices left.
-M1 came to Stand#2 for a slice.
-M1 got a slice from Stand#2, so 3 slices left.
+B2 put the cake with 7 slices on Stand#1.
+M3 came to Stand#1 for a slice.
+M3 got a slice from Stand#1, so 6 slices left.
 B2 baked a cake with 5 slices.
-M1 came to Stand#3 for a slice.
-M1 got a slice from Stand#3, so 4 slices left.
-M1 came to Stand#3 for a slice.
-M1 got a slice from Stand#3, so 3 slices left.
-M1 came to Stand#4 for a slice.
-M1 got a slice from Stand#4, so 3 slices left.
+B1 baked a cake with 3 slices.
+M2 came to Stand#1 for a slice.
+M2 got a slice from Stand#1, so 5 slices left.
+B3 baked a cake with 7 slices.
+M3 came to Stand#1 for a slice.
+M3 got a slice from Stand#1, so 4 slices left.
+M3 came to Stand#3 for a slice.
+M3 got a slice from Stand#3, so 5 slices left.
 S1 brought a new stand.
-S1 added Stand#6.
-B3 put the cake with 3 slices on Stand#6.
-B3 baked a cake with 5 slices.
+S1 added Stand#5.
+B2 put the cake with 5 slices on Stand#5.
+S2 brought a new stand.
+S2 added Stand#6.
+B1 put the cake with 3 slices on Stand#6.
+B2 baked a cake with 5 slices.
+B1 baked a cake with 6 slices.
